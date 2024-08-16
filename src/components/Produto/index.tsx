@@ -1,7 +1,10 @@
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { Produto as ProdutoType } from '../../App'
 import * as S from './styles'
 import { adicionar } from '../../store/reducers/carrinho'
+import { adicionarOuRemover } from '../../store/reducers/favoritos'
+import { paraReal } from '../../utils/format'
+import { RootState } from '../../store'
 
 type Props = {
   produto: ProdutoType
@@ -9,13 +12,19 @@ type Props = {
   estaNosFavoritos: boolean
 }
 
-export const paraReal = (valor: number) =>
-  new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(
-    valor
-  )
-
 const ProdutoComponent = ({ produto, favoritar, estaNosFavoritos }: Props) => {
   const dispatch = useDispatch()
+  const itensCarrinho = useSelector((state: RootState) => state.carrinho.itens)
+
+  const estaNoCarrinho = itensCarrinho.some((item) => item.id === produto.id)
+
+  const handleAdicionarAoCarrinho = () => {
+    if (estaNoCarrinho) {
+      alert('Este item já está no carrinho.')
+    } else {
+      dispatch(adicionar(produto))
+    }
+  }
 
   return (
     <S.Produto>
@@ -31,7 +40,7 @@ const ProdutoComponent = ({ produto, favoritar, estaNosFavoritos }: Props) => {
           ? '- Remover dos favoritos'
           : '+ Adicionar aos favoritos'}
       </S.BtnComprar>
-      <S.BtnComprar onClick={() => dispatch(adicionar(produto))} type="button">
+      <S.BtnComprar onClick={handleAdicionarAoCarrinho} type="button">
         Adicionar ao carrinho
       </S.BtnComprar>
     </S.Produto>

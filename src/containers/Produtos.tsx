@@ -1,19 +1,18 @@
-import { useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import Produto from '../components/Produto'
 import { useGetProdutosQuery } from '../services/api'
 import * as S from './styles'
 import { Produto as ProdutoType } from '../App'
+import { RootState } from '../store'
+import { adicionarOuRemover } from '../store/reducers/favoritos'
 
 const ProdutosComponent = () => {
+  const dispatch = useDispatch()
   const { data: produtos, isLoading } = useGetProdutosQuery()
-  const [favoritos, setFavoritos] = useState<ProdutoType[]>([])
+  const favoritos = useSelector((state: RootState) => state.favoritos.itens)
 
   const favoritar = (produto: ProdutoType) => {
-    if (favoritos.find((p) => p.id === produto.id)) {
-      setFavoritos(favoritos.filter((p) => p.id !== produto.id))
-    } else {
-      setFavoritos([...favoritos, produto])
-    }
+    dispatch(adicionarOuRemover(produto))
   }
 
   const produtoEstaNosFavoritos = (produto: ProdutoType) => {
